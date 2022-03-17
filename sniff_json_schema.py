@@ -14,11 +14,19 @@ def process_file(file):
     """
     # Confirm file passed is a json file
     if file[-5:] != ".json":
-        raise Exception("Please check: {}\nProgram only processes 'JSON' files!".format(file))
+        # Not raising an exception here incase you want to batch process a ton of json files
+        # raise Exception("Please check: {}\nProgram only processes 'JSON' files!".format(file))
+        print("\nProgram only processes 'JSON' files! Please check: {}".format(file))
+        return
 
     with open(file, "r") as f:
         data = f.read()
+    
+    try:
         data = json.loads(data)
+    except:
+        print("\nProgram only processes 'JSON' files! Please check: {}".format(file))
+        return
 
     return data
 
@@ -90,17 +98,23 @@ def run(file):
         file (str): Relative of full path of json file.
     """
     data = process_file(file)
-    schema = generate_schema(data)
 
-    root = "schema"
-    filename = os.path.basename(file)
-    output_file = os.path.join(root, filename)
+    if data is not None:
+        schema = generate_schema(data)
 
-    if not os.path.exists(root):
-        os.makedirs(root)
+        root = "schema"
+        filename = os.path.basename(file)
+        output_file = os.path.join(root, filename)
 
-    with open(output_file, "w") as f:
-        f.write(json.dumps(schema, indent=4))
+        if not os.path.exists(root):
+            os.makedirs(root)
+
+        with open(output_file, "w") as f:
+            f.write(json.dumps(schema, indent=4))
+
+        print("{} processed and schema saved at {}".format(file, output_file))
+    else:
+        print("-----------------------{} skiped------------------------------\n".format(file))
 
 
 

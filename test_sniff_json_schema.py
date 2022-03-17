@@ -1,9 +1,9 @@
-import pytest
 from sniff_json_schema import process_file, get_type
 
+# Can be tested with pytest
+
 def test_exception_on_incorrect_file_name():
-    with pytest.raises(Exception) as e:
-        process_file("name/mike/filejson")
+    assert(process_file("name/mike/filejson") == None)
 
 def test_string_identification():
     assert(get_type("Mike") == "STRING")
@@ -33,6 +33,6 @@ def test_array_identification():
     assert(get_type([12, 19, 42]) == "ARRAY")
 
 def test_emum_identification():
-    assert(get_type(["Mike", "George"]))
+    assert(get_type(["Mike", "George"]) == "ENUM")
 
 
