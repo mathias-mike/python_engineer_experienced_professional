@@ -1,0 +1,6 @@
+str = "STRING"
+int = "INTEGER"
+enum = "ENUM"
+arr = "ARRAY"
+obj = "OBJECT"
+bool = "BOOLEAN"
