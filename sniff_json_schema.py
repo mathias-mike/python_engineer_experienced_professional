@@ -32,7 +32,6 @@ def process_file(file):
 
 
 
-
 def get_type(value):
     """ Function gets the defined json data type of a given variable. Data types are from the datatypes file.
 
@@ -64,8 +63,19 @@ def get_type(value):
 
 
 
+def save_schema(root, schema_name, schema):
+    schema_name = schema_name + ".json"
+    output_file = os.path.join(root, schema_name)
 
-def generate_schema(data):
+    if not os.path.exists(root):
+        os.makedirs(root)
+
+    with open(output_file, "w") as f:
+        f.write(json.dumps(schema, indent=4))
+
+
+
+def generate_schema(root, schema_name, data):
     """ Function generates schema for attributes of the "message" key of given json object.
 
     Args:
@@ -74,19 +84,22 @@ def generate_schema(data):
     Returns:
         schema (dict): Schema generated from parsing the "message" attribute of the json object.
     """
-    message = data.get("message", {})
-
+    
     schema = {}
-    for key, value in message.items():
+    for key, value in data.items():
         schema[key] = {}
-        schema[key]["type"] = get_type(value)
+
+        dtype = get_type(value)
+        if dtype == dt.obj:
+            new_root = os.path.join(root, key)
+            generate_schema(new_root, key, value)
+
+        schema[key]["type"] = dtype
         schema[key]["tag"] = ""
         schema[key]["description"] = ""
         schema[key]["required"] = False
 
-    return schema
-
-
+    save_schema(root, schema_name, schema)
 
 
 def run(file):
@@ -98,24 +111,16 @@ def run(file):
     data = process_file(file)
 
     if data is not None:
-        schema = generate_schema(data)
-
         # Creatin the directory for the schema
-        root = "schema"
-        filename = os.path.basename(file)
-        output_file = os.path.join(root, filename)
+        filename = os.path.basename(file)[:-5]
+        root = os.path.join("schema", filename)
 
-        if not os.path.exists(root):
-            os.makedirs(root)
+        data = data.get("message", {})
+        generate_schema(root, filename, data)
 
-        with open(output_file, "w") as f:
-            f.write(json.dumps(schema, indent=4))
-
-        print("{} processed and schema saved at {}".format(file, output_file))
+        print("{} processed and schema saved at {}".format(file, root))
     else:
         print("-----------------------{} skiped------------------------------\n".format(file))
-
-
 
 
 def main():
