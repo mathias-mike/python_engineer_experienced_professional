@@ -64,27 +64,38 @@ def get_type(value):
 
 
 def save_schema(root, schema_name, schema):
+    """ Function saves detected json schema in the root/schema_name.json file
+
+    Args:
+        root (str): Root path for directory to save the schema in
+        schema_name (str): Name for file to save the schema in. A ".json" would be appended to this.
+        schema (dict): Dictionary object defining the schema of the json file.
+    """
+
+    # Defining the output file for the detected schema. Using os.path to append the schema_name to root because different
+    # os has different ways of referencing directories (window uses the backslash "\" while linux uses the forward slash "/")
     schema_name = schema_name + ".json"
     output_file = os.path.join(root, schema_name)
 
+    # Ensuring that root path exist and if not, we create the path including all it's parent.
     if not os.path.exists(root):
         os.makedirs(root)
 
+    # Finally dumping detected schema
     with open(output_file, "w") as f:
         f.write(json.dumps(schema, indent=4))
 
 
 
 def generate_schema(root, schema_name, data):
-    """ Function generates schema for attributes of the "message" key of given json object.
+    """ Function generates schema for attributes of the given json object (data.
 
     Args:
-        data (dict): Python dictionary to parse and generate schema for its "message" attribute.
-
-    Returns:
-        schema (dict): Schema generated from parsing the "message" attribute of the json object.
+        root (str): Root path for directory to save the schema in.
+        schema_name (str): Name for file to save the schema in. A ".json" would be appended to this.
+        data (dict): Python dictionary to parse and generate schema for its attributes.
     """
-    
+
     schema = {}
     for key, value in data.items():
         schema[key] = {}
@@ -106,7 +117,7 @@ def run(file):
     """ Sniff json schema of json file.
 
     Args:
-        file (str): Relative of full path of json file.
+        file (str): Relative or full path of json file.
     """
     data = process_file(file)
 
