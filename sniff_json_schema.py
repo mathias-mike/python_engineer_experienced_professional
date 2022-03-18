@@ -24,8 +24,8 @@ def process_file(file):
     
     try:
         data = json.loads(data)
-    except:
-        print("\nProgram only processes 'JSON' files! Please check: {}".format(file))
+    except Exception as e:
+        print("\nError parsing file:: {}".format(e))
         return
 
     return data
@@ -48,9 +48,7 @@ def get_type(value):
         dtype = dt.obj
     elif isinstance(value, bool):
         dtype = dt.bool
-    elif isinstance(value, int):
-        dtype = dt.int
-    elif isinstance(value, float):
+    elif isinstance(value, int) or isinstance(value, float):
         dtype = dt.int
     elif isinstance(value, str):
         dtype = dt.str
@@ -102,6 +100,7 @@ def run(file):
     if data is not None:
         schema = generate_schema(data)
 
+        # Creatin the directory for the schema
         root = "schema"
         filename = os.path.basename(file)
         output_file = os.path.join(root, filename)
